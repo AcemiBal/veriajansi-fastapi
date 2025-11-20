@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Veri Ajansı – Otomatik Analiz Raporu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f3f4f6;     /* AÇIK ARKA PLAN */
+      color:#0f172a;
+      padding:16px;
+    }
+    .page {
+      max-width:1120px;
+      margin:0 auto;
+    }
+
+    /* Üst bar */
+    .topbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+      gap:12px;
+    }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img {
+      width:36px;
+      height:36px;
+      object-fit:contain;
+    }
+    .brand-main { font-size:18px;font-weight:650; }
+    .brand-sub { font-size:12px;color:#6b7280; }
+    .links a {
+      font-size:12px;
+      color:#0f766e;
+      text-decoration:none;
+      margin-left:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#e0f2f1;
+      border:1px solid #99f6e4;
+      display:inline-block;
+    }
+    .links a:hover { background:#ccfbf1; }
+
+    /* Genel grid */
+    .layout {
+      display:grid;
+      grid-template-columns:2fr 1.3fr;
+      gap:16px;
+    }
+
+    .card {
+      background:white;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.6);
+      padding:14px 14px 12px;
+      box-shadow:0 14px 35px rgba(15,23,42,0.09);
+    }
+    h2 {
+      margin:0 0 8px;
+      font-size:16px;
+      color:#0f172a;
+    }
+    h3 {
+      margin:10px 0 6px;
+      font-size:13px;
+      color:#111827;
+    }
+
+    .meta {
+      font-size:12px;
+      color:#4b5563;
+      margin-bottom:8px;
+    }
+    .quality {
+      font-size:12px;
+      color:#374151;
+      margin-bottom:10px;
+    }
+    .quality strong { color:#0f766e; }
+
+    /* Alan pill’leri */
+    .pill-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:4px;
+      margin-bottom:8px;
+    }
+    .pill {
+      border-radius:999px;
+      padding:3px 8px;
+      font-size:11px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      color:#111827;
+    }
+
+    /* Tablo stilleri */
+    .table-wrapper {
+      max-height:360px;
+      overflow:auto;
+      font-size:11px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      background:white;
+    }
+    table {
+      border-collapse:collapse;
+      width:100%;
+    }
+    th, td {
+      padding:4px 6px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      white-space:nowrap;
+    }
+    th {
+      background:#f1f5f9;
+      position:sticky;
+      top:0;
+      font-size:11px;
+      color:#4b5563;
+      z-index:1;
+    }
+    tr:nth-child(even) td {
+      background:#f9fafb;
+    }
+
+    /* Sağ panel – grafikler & içgörüler */
+    .chart-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:6px;
+    }
+    .chart-row img {
+      max-width:160px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:white;
+    }
+    .insights {
+      font-size:12px;
+      color:#374151;
+      margin:4px 0 0;
+      padding-left:18px;
+    }
+    .insights li { margin-bottom:3px; }
+
+    .category-block {
+      margin-top:6px;
+      font-size:12px;
+      color:#111827;
+    }
+    .category-block strong {
+      color:#0f172a;
+    }
+    .category-block ul {
+      margin:2px 0 4px;
+      padding-left:18px;
+      font-size:11px;
+      color:#4b5563;
+    }
+
+    .section-divider {
+      height:1px;
+      background:#e5e7eb;
+      margin:10px 0;
+    }
+
+    @media(max-width:900px){
+      .layout { grid-template-columns:1fr; }
+    }
+
+    /* Yazdırma görünümü için ufak iyileştirme */
+    @media print {
+      body {
+        background:white;
+        padding:0;
+      }
+      .page {
+        max-width:none;
+        margin:0;
+      }
+      .card {
+        box-shadow:none;
+      }
+      .links { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+        <div>
+          <div class="brand-main">Veri Ajansı – Otomatik Analiz Raporu</div>
+          <div class="brand-sub">
+            {{ company }} · {{ data_type }} · Dosya: {{ file_name }}
+          </div>
+        </div>
+      </div>
+      <div class="links">
+        <a href="/upload">Yeni veri yükle</a>
+        <a href="/dashboard">Son dashboard</a>
+        <a href="#" onclick="window.print();return false;">PDF / Yazdır</a>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- SOL: Özet + istatistikler + örnek tablo -->
+      <section class="card">
+        <h2>Genel Özet</h2>
+
+        <div class="meta">
+          Toplam satır: <strong>{{ row_count }}</strong>,
+          sütun: <strong>{{ col_count }}</strong><br>
+          Veri sahibi: <strong>{{ name }}</strong> ({{ email }})
+        </div>
+
+        <div class="quality">
+          Veri kalite skoru: <strong>{{ '%.1f'|format(quality_score) }}%</strong><br>
+          Toplam hücre: {{ total_cells }}, eksik hücre: {{ total_missing }}.
+          {% if top_missing_col %}
+          <br>En çok eksik değer içeren kolon: <strong>{{ top_missing_col }}</strong>
+          {% endif %}
+          {% if top_var_col %}
+          <br>Değişkenliği en yüksek sayısal kolon: <strong>{{ top_var_col }}</strong>
+          {% endif %}
+        </div>
+
+        <h3>Alan Listesi</h3>
+        <div class="pill-row">
+          {% for col in columns %}
+          <div class="pill">{{ col }}</div>
+          {% endfor %}
+        </div>
+
+        <h3>Sayısal Alan İstatistikleri</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Alan</th>
+                <th>Min</th>
+                <th>Maks</th>
+                <th>Ortalama</th>
+                <th>Toplam</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for col, stats in summary_stats.items() %}
+              <tr>
+                <td>{{ col }}</td>
+                <td>{{ '%.2f'|format(stats.min) }}</td>
+                <td>{{ '%.2f'|format(stats.max) }}</td>
+                <td>{{ '%.2f'|format(stats.mean) }}</td>
+                <td>{{ '%.2f'|format(stats.sum) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>Örnek İlk 20 Satır</h3>
+        <div class="table-wrapper">
+          {{ sample_html|safe }}
+        </div>
+      </section>
+
+      <!-- SAĞ: Grafikler + içgörüler + kategorik özetler -->
+      <aside class="card">
+        <h2>Görseller ve İçgörüler</h2>
+
+        <h3>Grafikler</h3>
+        <div class="chart-row">
+          {% for path in chart_paths %}
+          <img src="{{ path }}" alt="Grafik">
+          {% endfor %}
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h3>Alan Bazlı İçgörüler</h3>
+        {% if domain_insights %}
+        <ul class="insights">
+          {% for msg in domain_insights %}
+          <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="insights">Bu veri seti için genel istatistikler hesaplandı. İleri seviye içgörüler için özel modeller eklenebilir.</p>
+        {% endif %}
+
+        {% if top_categories %}
+        <div class="section-divider"></div>
+        <h3>Kategorik Alan Özetleri</h3>
+        {% for col, cats in top_categories.items() %}
+        <div class="category-block">
+          <strong>{{ col }}</strong>
+          <ul>
+            {% for k, v in cats.items() %}
+            <li>{{ k }} → {{ v }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+        {% endif %}
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
