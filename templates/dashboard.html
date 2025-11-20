@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Veri Ajansı – Dashboard</title>
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#1d283a,#020617 60%);
+      color:#e5e7eb;
+    }
+    .shell {
+      min-height:100vh;
+      padding:18px 26px 26px;
+    }
+    .header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .title {
+      font-size:18px;
+      font-weight:600;
+    }
+    .subtitle {
+      font-size:12px;
+      color:#9ca3af;
+    }
+    .links a {
+      font-size:12px;
+      color:#cbd5f5;
+      margin-left:10px;
+      text-decoration:none;
+    }
+    .links a:hover { color:white; }
+
+    .grid {
+      display:grid;
+      grid-template-columns:2.1fr 1.3fr;
+      gap:16px;
+    }
+    .card {
+      background:rgba(15,23,42,0.96);
+      border-radius:18px;
+      padding:14px 14px 12px;
+      border:1px solid rgba(148,163,184,0.45);
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    }
+    .card h3 {
+      margin:0 0 8px;
+      font-size:14px;
+    }
+    .kpi-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .kpi {
+      flex:1 1 120px;
+      padding:8px 9px;
+      border-radius:12px;
+      background:linear-gradient(135deg,#0f172a,#1e293b);
+      border:1px solid rgba(148,163,184,0.5);
+      font-size:12px;
+    }
+    .kpi span {
+      display:block;
+    }
+    .kpi-label {
+      color:#9ca3af;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+    .kpi-value {
+      font-size:16px;
+      font-weight:600;
+      color:#e5e7eb;
+      margin-top:2px;
+    }
+    .charts {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:6px;
+    }
+    .chart-card {
+      flex:1 1 210px;
+      max-width:240px;
+      border-radius:12px;
+      background:#020617;
+      border:1px solid rgba(148,163,184,0.5);
+      padding:6px;
+    }
+    .chart-card img {
+      width:100%;
+      border-radius:8px;
+    }
+    .chart-title {
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:3px;
+    }
+    .info {
+      font-size:12px;
+      color:#9ca3af;
+    }
+    @media (max-width:900px) {
+      .shell { padding:14px; }
+      .grid { grid-template-columns:1fr; }
+    }
+      html[data-theme="light"] body {
+      background:#f3f4f6;
+      color:#0f172a;
+    }
+    html[data-theme="light"] .card {
+      background:#ffffff;
+      border-color:#e5e7eb;
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı" style="width:32px;height:32px;object-fit:contain;">
+    <div>
+      <div class="title">Veri Ajansı – Son Veri Dashboard</div>
+      <div class="subtitle">Dosya: {{ file_name }} ({{ data_type }}) – Satır: {{ row_count }}, Sütun: {{ col_count }}</div>
+    </div>
+  </div>
+    <div class="links">
+      <a href="/upload">Yeni Veri Yükle</a>
+      <a href="/admin/uploads?key=veriadmin">Yükleme Kayıtları</a>
+      <a href="#" onclick="toggleTheme();return false;">Tema</a>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Genel Durum</h3>
+      <div class="kpi-row">
+        <div class="kpi">
+          <span class="kpi-label">Toplam Satır</span>
+          <span class="kpi-value">{{ row_count }}</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Toplam Sütun</span>
+          <span class="kpi-value">{{ col_count }}</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Veri Kalite Puanı</span>
+          <span class="kpi-value">{{ "%.1f"|format(quality_score) }}%</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-label">Sayısal Kolon</span>
+          <span class="kpi-value">{{ numeric_cols|length }}</span>
+        </div>
+      </div>
+      <p class="info">
+        Veri kalite puanı; eksik hücre oranına göre yaklaşık bir kalite metriğidir. Detaylı temizlik ve modelleme için ek çalışma önerilir.
+      </p>
+    </section>
+
+    <section class="card">
+      <h3>Kısa Notlar</h3>
+      <ul class="info">
+        <li>Örnek kayıt sayısı: ilk 20 satır raporda gösterilir.</li>
+        <li>Grafikler, ilk sayısal kolon ve varsa zaman serisi kolonlarına göre otomatik üretilir.</li>
+        <li>Admin ekranından geçmiş yüklemelere ve müşteri iletişim bilgilerine erişebilirsiniz.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:14px;">
+    <h3>Grafikler</h3>
+    {% if chart_data %}
+    <div style="margin-bottom:14px;display:flex;justify-content:flex-start;">
+      <div style="max-width:520px;width:100%;">
+        <canvas id="interactiveChartDash" style="width:100%;height:220px;max-height:260px;background:#020617;border-radius:12px;border:1px solid #4b5563;"></canvas>
+        <script type="application/json" id="chartDataJsonDash">{{ chart_data | tojson }}</script>
+      </div>
+    </div>
+    {% endif %}
+    <div class="charts">
+      {% if chart_paths %}
+        {% for path in chart_paths %}
+        <div class="chart-card">
+          <div class="chart-title">Grafik {{ loop.index }}</div>
+          <img src="{{ path }}" alt="Grafik">
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="info">Henüz gösterilecek grafik bulunamadı.</p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.dataset.theme || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    try { localStorage.setItem('va-theme', next); } catch(e){}
+  }
+  (function initTheme(){
+    try {
+      const saved = localStorage.getItem('va-theme') || 'dark';
+      document.documentElement.dataset.theme = saved;
+    } catch(e){
+      document.documentElement.dataset.theme = 'dark';
+    }
+  })();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const el = document.getElementById('interactiveChartDash');
+    if (!el) return;
+    const dataEl = document.getElementById('chartDataJsonDash');
+    if (!dataEl) return;
+    const payload = JSON.parse(dataEl.textContent || '{}');
+    if (!payload || !payload.values || payload.values.length === 0) return;
+
+    const ctx = el.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: payload.labels,
+        datasets: [{
+          label: payload.label,
+          data: payload.values,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true } },
+        scales: { x: { ticks: { display: false } } }
+      }
+    });
+  });
+</script>
+</body>
+</html>
+</html>
