@@ -25,6 +25,27 @@ import matplotlib.pyplot as plt
 # -------------------------------------------------
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class FrameAllowMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["X-Frame-Options"] = "ALLOWALL"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(FrameAllowMiddleware)
+
+
 # Statik dosyalar ve Jinja2 şablonları
 os.makedirs("static/charts", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
