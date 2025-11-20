@@ -2,310 +2,210 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Veri Ajansı – Veri Yükleme</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * { box-sizing:border-box; }
     body {
       margin:0;
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background: radial-gradient(circle at top left,#e0f2fe,#eef2ff 40%,#f9fafb 70%);
+      background:#f3f4f6;
       color:#0f172a;
-    }
-    .layout {
+
       min-height:100vh;
       display:flex;
     }
     .sidebar {
       width:260px;
-      padding:28px 22px;
-      background:rgba(15,23,42,0.92);
-      color:#e5e7eb;
+      background:#020617;
+      border-right:1px solid #1f2937;
+      padding:18px 16px;
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
+      gap:18px;
     }
     .brand {
       display:flex;
       align-items:center;
-      gap:12px;
-      margin-bottom:24px;
+      gap:10px;
     }
-    .brand-logo {
-      width:40px;
-      height:40px;
-      border-radius:999px;
-      background:radial-gradient(circle at 30% 20%,#14b8a6,#0f766e 40%,#0f766e);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      font-size:18px;
-      color:white;
+    .brand img {
+      width:36px;
+      height:36px;
+      object-fit:contain;
     }
-    .brand-text-main {
-      font-size:16px;
-      font-weight:600;
-    }
-    .brand-text-sub {
-      font-size:12px;
-      color:#9ca3af;
-    }
-    .nav-links a {
+    .brand-main { font-size:15px;font-weight:600; }
+    .brand-sub { font-size:11px;color:#9ca3af; }
+    .nav a {
       display:block;
       font-size:13px;
-      padding:8px 10px;
-      border-radius:999px;
       color:#e5e7eb;
       text-decoration:none;
+      padding:6px 8px;
+      border-radius:999px;
       margin-bottom:4px;
     }
-    .nav-links a.primary {
-      background:linear-gradient(135deg,#14b8a6,#0f766e);
-      color:white;
-      font-weight:600;
+    .nav a:hover {
+      background:rgba(15,118,110,0.25);
     }
-    .nav-links a:hover {
-      background:rgba(148,163,184,0.26);
-    }
-    .sidebar-footer {
-      font-size:11px;
-      color:#6b7280;
-    }
-
     .content {
       flex:1;
+      padding:22px 18px;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:40px 32px;
     }
     .card {
       width:100%;
-      max-width:640px;
-      background:white;
-      border-radius:22px;
-      padding:26px 26px 22px;
-      box-shadow:0 24px 60px rgba(15,23,42,0.18);
-      border:1px solid rgba(148,163,184,0.35);
+      max-width:760px;
+      background:rgba(15,23,42,0.96);
+      border-radius:20px;
+      padding:22px 20px 20px;
+      border:1px solid rgba(45,212,191,0.5);
+      box-shadow:0 20px 60px rgba(0,0,0,0.8);
     }
-    .card-header {
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:16px;
-      align-items:flex-start;
-    }
-    .card-title {
+    h1 {
+      margin:0 0 4px;
       font-size:20px;
-      font-weight:650;
     }
-    .card-sub {
-      font-size:13px;
-      color:#6b7280;
-      margin-top:4px;
-    }
-    .pill {
-      display:inline-flex;
-      align-items:center;
-      padding:4px 10px;
-      border-radius:999px;
-      font-size:11px;
-      background:#eff6ff;
-      color:#0f766e;
-    }
-    form {
-      margin-top:8px;
+    .subtitle {
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:16px;
     }
     .grid {
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:1fr 1fr;
       gap:12px 16px;
     }
     label {
       font-size:12px;
-      color:#4b5563;
-      margin-bottom:4px;
+      color:#cbd5f5;
       display:block;
+      margin-bottom:4px;
     }
     input, select {
       width:100%;
-      padding:8px 10px;
-      border-radius:11px;
-      border:1px solid #d1d5db;
+      padding:7px 9px;
+      border-radius:10px;
+      border:1px solid #4b5563;
+      background:#020617;
+      color:#e5e7eb;
       font-size:13px;
-      outline:none;
-      background:#f9fafb;
     }
     input:focus, select:focus {
-      border-color:#0f766e;
-      box-shadow:0 0 0 1px rgba(14,165,233,0.5);
-      background:#ffffff;
+      outline:none;
+      border-color:#14b8a6;
+      box-shadow:0 0 0 1px rgba(45,212,191,0.3);
     }
-    .full {
-      grid-column:1 / -1;
+    .file-row {
+      margin-top:8px;
+      margin-bottom:10px;
     }
-    .file-input {
-      border:1px dashed #9ca3af;
-      background:#f3f4f6;
-      padding:10px 10px;
-      border-radius:14px;
+    .file-row input[type=file] {
+      padding:5px;
+      background:#020617;
+      border-radius:10px;
+      border:1px dashed #4b5563;
       font-size:12px;
-      color:#4b5563;
     }
     .actions {
       display:flex;
-      justify-content:space-between;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:10px;
       align-items:center;
-      margin-top:16px;
-      gap:8px;
+      flex-wrap:wrap;
     }
-    .btn-primary {
-      flex:1;
+    .btn {
       border:none;
       border-radius:999px;
-      padding:10px 14px;
-      background:linear-gradient(135deg,#0f766e,#0f766e);
-      color:white;
-      font-size:14px;
+      padding:8px 16px;
+      font-size:13px;
       font-weight:600;
       cursor:pointer;
-      box-shadow:0 16px 30px rgba(34,197,94,0.35);
     }
-    .btn-primary:hover { filter:brightness(1.05); }
+    .btn-primary {
+      background:linear-gradient(135deg,#0f766e,#14b8a6);
+      color:#ecfeff;
+    }
+    .btn-primary:hover { opacity:0.96; }
     .hint {
       font-size:11px;
-      color:#6b7280;
-      text-align:right;
+      color:#9ca3af;
+      margin-top:4px;
     }
-
-    @media (max-width:900px) {
-      .layout { flex-direction:column; }
-      .sidebar { width:100%; flex-direction:row; align-items:center; }
-      .sidebar-footer { display:none; }
-      .content { padding:24px 16px 32px; }
-      .card { border-radius:18px; }
-    }
-    @media (max-width:600px) {
+    @media(max-width:900px) {
+      body { flex-direction:column; }
+      .sidebar {
+        width:100%;
+        flex-direction:row;
+        align-items:center;
+        justify-content:space-between;
+      }
+      .content { padding:14px; }
       .grid { grid-template-columns:1fr; }
-      .actions { flex-direction:column; align-items:stretch; }
-    }
-      html[data-theme="light"] body {
-      background:#f3f4f6;
-      color:#0f172a;
-    }
-    html[data-theme="light"] .card {
-      background:#ffffff;
-      border-color:#e5e7eb;
-    }
-    html[data-theme="light"] .sidebar {
-      background:#0f172a;
     }
   </style>
 </head>
 <body>
-<div class="layout">
   <aside class="sidebar">
-    <div>
-      <div class="brand">
-  <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı" style="width:40px;height:40px;object-fit:contain;">
-  <div>
-    <div class="brand-text-main">Veri Ajansı</div>
-    <div class="brand-text-sub">Akıllı Veri Analiz Platformu</div>
-  </div>
-</div>
-      <div class="nav-links">
-        <a href="/upload" class="primary">Veri Yükle</a>
-        <a href="/dashboard">Son Dashboard</a>
-        <a href="/admin/uploads?key=veriadmin">Yükleme Kayıtları</a>
-        <a href="#" onclick="toggleTheme();return false;">Tema</a>
+    <div class="brand">
+      <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+      <div>
+        <div class="brand-main">Veri Ajansı</div>
+        <div class="brand-sub">Akıllı Veri Analiz Platformu</div>
       </div>
     </div>
-    <div class="sidebar-footer">
-      © Veri Ajansı – İçgörüye Dönüşen Veriler
-    </div>
+    <nav class="nav">
+      <a href="/upload">Veri yükle</a>
+      <a href="/dashboard">Son dashboard</a>
+      <a href="/login">Admin girişi</a>
+    </nav>
   </aside>
 
   <main class="content">
     <div class="card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Verinizi Yükleyin</div>
-          <div class="card-sub">
-            CSV veya Excel dosyanızı yükleyin, birkaç saniye içinde işletmenize özel ilk analiz ve grafikler otomatik oluşsun.
-          </div>
-        </div>
-        <div class="pill">Beta: Veri Analiz Asistanı v10</div>
+      <h1>Verinizi Yükleyin</h1>
+      <div class="subtitle">
+        Excel veya CSV dosyanızı yükleyin, birkaç saniye içinde otomatik özet, grafikler ve kalite analizi oluşsun.
       </div>
-
-      <form action="/api/upload" method="post" enctype="multipart/form-data">
+      <form method="post" action="/api/upload" enctype="multipart/form-data">
         <div class="grid">
           <div>
-            <label>Ad Soyad</label>
-            <input type="text" name="name" placeholder="Adınız Soyadınız" required>
+            <label for="name">Adınız Soyadınız</label>
+            <input id="name" name="name" required>
           </div>
           <div>
-            <label>Şirket</label>
-            <input type="text" name="company" placeholder="Şirket adı" required>
+            <label for="company">Firma / Kurum</label>
+            <input id="company" name="company" required>
           </div>
           <div>
-            <label>E-posta</label>
-            <input type="email" name="email" placeholder="ornek@firma.com" required>
+            <label for="email">E-posta</label>
+            <input id="email" type="email" name="email" required>
           </div>
           <div>
-            <label>Telefon</label>
-            <input type="text" name="phone" placeholder="+90..." required>
+            <label for="phone">Telefon</label>
+            <input id="phone" name="phone" required>
           </div>
           <div>
-            <label>Veri Türü</label>
-            <select name="data_type" required>
-              <option value="enerji">Enerji</option>
-              <option value="uretim">Üretim</option>
-              <option value="satis">Satış</option>
-              <option value="depo">Depo / Stok</option>
-              <option value="kalite">Kalite</option>
-              <option value="genel">Genel</option>
-            </select>
+            <label for="data_type">Veri tipi (enerji, üretim, satış vb.)</label>
+            <input id="data_type" name="data_type" placeholder="örn. enerji tüketimi, üretim kayıtları" required>
           </div>
-          <div class="full">
-            <label>Dosya (CSV veya Excel)</label>
-            <div class="file-input">
-              <input type="file" name="file" required>
-              <div style="font-size:11px;color:#6b7280;margin-top:4px;">
-                Büyük verilerde ilk etapta sadece örneklem alınarak analiz yapılır. Tam analiz için ek çalışma planlanır.
-              </div>
-            </div>
-          </div>
+        </div>
+
+        <div class="file-row">
+          <label for="file">Veri dosyası (Excel veya CSV)</label>
+          <input id="file" type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+          <div class="hint">İlk satırınızda kolon isimleri (başlıklar) bulunması tavsiye edilir.</div>
         </div>
 
         <div class="actions">
-          <div class="hint">
-            Yükleme sonrası ayrıntılı rapor ve grafikler yeni sayfada açılacak.
-          </div>
-          <button type="submit" class="btn-primary">Yükle ve Analiz Et</button>
+          <div class="hint">Yükleme sonrası sistem otomatik rapor ekranına yönlendirecek.</div>
+          <button type="submit" class="btn btn-primary">Analizi Başlat</button>
         </div>
       </form>
     </div>
   </main>
-</div>
-
-<script>
-  function toggleTheme() {
-    const html = document.documentElement;
-    const current = html.dataset.theme || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.dataset.theme = next;
-    try { localStorage.setItem('va-theme', next); } catch(e){}
-  }
-  (function initTheme(){
-    try {
-      const saved = localStorage.getItem('va-theme') || 'dark';
-      document.documentElement.dataset.theme = saved;
-    } catch(e){
-      document.documentElement.dataset.theme = 'dark';
-    }
-  })();
-</script>
 </body>
-</html>
 </html>

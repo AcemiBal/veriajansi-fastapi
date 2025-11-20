@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Veri Ajansı – Akıllı Veri Analiz Platformu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f3f4f6; /* AÇIK ARKA PLAN */
+      color:#0f172a;
+    }
+    .hero {
+      max-width:980px;
+      margin:0 auto;
+      padding:32px 16px 40px;
+      display:grid;
+      grid-template-columns: minmax(0,1.4fr) minmax(0,1fr);
+      gap:26px;
+      align-items:center;
+    }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .brand img {
+      width:40px;
+      height:40px;
+      object-fit:contain;
+    }
+    .brand-main {
+      font-size:14px;
+      font-weight:600;
+      color:#0f766e;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+    h1 {
+      margin:0 0 10px;
+      font-size:28px;
+      line-height:1.2;
+      color:#0f172a;
+    }
+    .lead {
+      font-size:14px;
+      color:#4b5563;
+      margin-bottom:18px;
+    }
+    .actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .btn {
+      border:none;
+      border-radius:999px;
+      padding:10px 18px;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn-primary {
+      background:linear-gradient(135deg,#0f766e,#14b8a6);
+      color:#ecfeff;
+    }
+    .btn-primary:hover { opacity:0.95; }
+    .btn-ghost {
+      background:#e5f4f3;
+      color:#0f766e;
+    }
+    .btn-ghost:hover {
+      background:#d1faf5;
+    }
+    .meta {
+      font-size:11px;
+      color:#6b7280;
+    }
+    .meta strong { color:#0f766e; }
+
+    .card {
+      background:white;
+      border-radius:18px;
+      border:1px solid rgba(148,163,184,0.5);
+      padding:16px 16px 14px;
+      box-shadow:0 16px 40px rgba(15,23,42,0.10);
+    }
+    .card-title {
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:6px;
+      color:#0f172a;
+    }
+    .card-sub {
+      font-size:11px;
+      color:#6b7280;
+      margin-bottom:10px;
+    }
+    .stat-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:10px;
+    }
+    .pill {
+      border-radius:999px;
+      padding:4px 9px;
+      background:#f1f5f9;
+      border:1px solid #e5e7eb;
+      font-size:11px;
+      color:#0f172a;
+    }
+    .mini-list {
+      font-size:11px;
+      color:#4b5563;
+      margin:0;
+      padding-left:16px;
+    }
+    .mini-list li { margin-bottom:3px; }
+
+    .footer {
+      max-width:980px;
+      margin:0 auto;
+      padding:10px 16px 24px;
+      font-size:11px;
+      color:#6b7280;
+      border-top:1px solid #e5e7eb;
+    }
+    .footer a {
+      color:#0f766e;
+      text-decoration:none;
+    }
+    .footer a:hover { text-decoration:underline; }
+
+    @media(max-width:900px){
+      .hero {
+        grid-template-columns:1fr;
+        padding-top:20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="hero">
+    <section>
+      <div class="brand">
+        <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+        <div>
+          <div class="brand-main">Veri Ajansı</div>
+          <div style="font-size:12px;color:#6b7280;">Akıllı veri analizi & hızlı içgörüler</div>
+        </div>
+      </div>
+
+      <h1>Excel veya CSV dosyanızdan<br> saniyeler içinde yönetici seviyesinde rapor.</h1>
+
+      <p class="lead">
+        Verinizi yükleyin, sisteminizin durumu, veri kalitesi, temel istatistikler ve görseller otomatik oluşsun.
+        Müşteri toplantıları, demo ve POC’ler için hazır bir “Veri Analiz Asistanı”.
+      </p>
+
+      <div class="actions">
+        <a href="/upload" class="btn btn-primary">Verinizi hemen yükleyin</a>
+        <a href="/dashboard" class="btn btn-ghost">Son dashboardu görüntüle</a>
+      </div>
+
+      <p class="meta">
+        <strong>Not:</strong> Yükleme formu ve rapor ekranı herkese açıktır; ancak yükleme kayıtları (loglar)
+        sadece admin girişi ile görüntülenebilir.
+      </p>
+    </section>
+
+    <aside class="card">
+      <div class="card-title">Bu panelde neler var?</div>
+      <div class="card-sub">Veri Ajansı demo platformu, dosyanızdan otomatik olarak şunları üretir:</div>
+      <div class="stat-row">
+        <div class="pill">Toplam satır / sütun sayısı</div>
+        <div class="pill">İlk 5 sayısal kolon için min–max–ortalama</div>
+        <div class="pill">Veri kalite skoru (%)</div>
+        <div class="pill">Eksik veri haritası & korelasyon</div>
+      </div>
+      <ul class="mini-list">
+        <li>Enerji, üretim, satış, depo, kalite gibi farklı veri tipleri için tematik görünüm.</li>
+        <li>Yükleme yapan kişilerin adı, firma bilgisi, e-posta ve telefonu admin panelinde loglanır.</li>
+        <li>Admin paneline sadece <strong>giriş yapan kullanıcılar</strong> erişebilir.</li>
+      </ul>
+      <div style="margin-top:8px;font-size:11px;color:#6b7280;">
+        Admin için giriş adresi: <strong><a href="/login">/login</a></strong>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    Veri Ajansı – Akıllı Veri Analiz Platformu.
+    <a href="/upload">Veri yükleme formuna git</a> ·
+    <a href="/login">Admin girişi</a>
+  </footer>
+</body>
+</html>

@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <title>Veri Ajansı – Yükleme Kayıtları</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Veri Ajansı – Admin Yükleme Kayıtları</title>
   <style>
     * { box-sizing:border-box; }
     body {
@@ -11,248 +11,160 @@
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:#020617;
       color:#e5e7eb;
-    }
-    .shell {
-      min-height:100vh;
-      padding:18px 26px 26px;
+      padding:16px;
     }
     .header {
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
-      margin-bottom:16px;
+      margin-bottom:14px;
+      gap:12px;
     }
-    .title { font-size:18px; font-weight:600; }
-    .subtitle { font-size:12px; color:#9ca3af; margin-top:2px; }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img {
+      width:28px;
+      height:28px;
+      object-fit:contain;
+    }
+    .title { font-size:18px;font-weight:600; }
+    .subtitle { font-size:12px;color:#9ca3af; }
     .links a {
       font-size:12px;
-      color:#cbd5f5;
-      margin-left:10px;
+      color:#bae6fd;
       text-decoration:none;
+      margin-left:10px;
     }
-    .links a:hover { color:white; }
-
-    .card {
-      background:rgba(15,23,42,0.96);
-      border-radius:18px;
-      padding:14px 14px 16px;
-      border:1px solid rgba(148,163,184,0.45);
-      box-shadow:0 22px 70px rgba(0,0,0,0.7);
-      max-width:1180px;
-      margin:0 auto;
-    }
+    .links a:hover { text-decoration:underline; }
     .filters {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      background:#020617;
+      border-radius:12px;
+      border:1px solid #1f2937;
+      padding:10px 10px 8px;
       margin-bottom:10px;
       font-size:12px;
     }
-    .filters input, .filters select {
+    .filter-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .filter-row input, .filter-row select {
       padding:5px 7px;
-      border-radius:999px;
+      border-radius:8px;
       border:1px solid #4b5563;
       background:#020617;
       color:#e5e7eb;
       font-size:12px;
     }
-    .filters button {
-      padding:6px 12px;
+    .filter-row button {
+      padding:6px 10px;
       border-radius:999px;
       border:none;
-      background:linear-gradient(135deg,#0f766e,#0f766e);
-      color:white;
+      background:linear-gradient(135deg,#0f766e,#14b8a6);
+      color:#ecfeff;
       font-size:12px;
       cursor:pointer;
     }
-    .filters a {
-      font-size:12px;
-      color:#9ca3af;
-      text-decoration:none;
-      margin-left:4px;
-    }
-    .filters a:hover { color:#e5e7eb; }
-
     table {
       border-collapse:collapse;
       width:100%;
       font-size:11px;
-      margin-top:6px;
     }
     th, td {
-      border:1px solid #111827;
+      border:1px solid #1f2937;
       padding:4px 5px;
       text-align:left;
-      white-space:nowrap;
     }
     th {
-      background:#020617;
+      background:#0b1120;
       position:sticky;
       top:0;
-      z-index:5;
+      z-index:1;
     }
-    tbody tr:nth-child(even) { background:#020617; }
-    tbody tr:nth-child(odd) { background:#030712; }
-
-    .table-wrap {
-      max-height:360px;
-      overflow:auto;
-      border-radius:12px;
-      border:1px solid #111827;
-      margin-bottom:10px;
-    }
-    .small-btn {
-      font-size:10px;
-      padding:3px 6px;
-      border-radius:999px;
-      border:none;
-      cursor:pointer;
-      background:#0f766e;
-      color:white;
-    }
-    textarea {
-      width:100%;
-      min-height:140px;
-      border-radius:12px;
-      border:1px solid #4b5563;
+    tbody tr:nth-child(even){
       background:#020617;
-      color:#e5e7eb;
-      font-size:12px;
-      padding:8px;
-      resize:vertical;
     }
-    .hint {
-      font-size:11px;
-      color:#9ca3af;
-      margin-top:4px;
+    tbody tr:nth-child(odd){
+      background:#020617;
     }
-    @media (max-width:900px) {
-      .shell { padding:14px; }
-      .header { flex-direction:column; gap:8px; }
-    }
-      html[data-theme="light"] body {
-      background:#f3f4f6;
-      color:#0f172a;
-    }
-    html[data-theme="light"] .card {
-      background:#ffffff;
-      border-color:#e5e7eb;
+    .table-wrapper {
+      max-height:480px;
+      overflow:auto;
+      border-radius:10px;
+      border:1px solid #1f2937;
     }
   </style>
-  <script>
-    function generateMail(name, email, data_type, row_count, col_count) {
-      const template = `
-Merhaba ${name},
-
-Yüklediğiniz ${data_type || "veri"} dosyası başarıyla incelendi.
-
-Özet bilgiler:
-- Kayıt sayısı: ${row_count}
-- Sütun sayısı: ${col_count}
-
-Dilerseniz bu veriler üzerinden daha detaylı bir analiz & raporlama çalışması yapabiliriz. Uygun olduğunuz bir zaman diliminde kısa bir toplantı planlayabiliriz.
-
-Saygılarımla,
-El Patron
-Veri Ajansı
-`;
-      document.getElementById('mailTemplate').value = template.trim();
-    }
-    function toggleTheme() {
-      const html = document.documentElement;
-      const current = html.dataset.theme || 'dark';
-      const next = current === 'dark' ? 'light' : 'dark';
-      html.dataset.theme = next;
-      try { localStorage.setItem('va-theme', next); } catch(e){}
-    }
-    (function initTheme(){
-      try {
-        const saved = localStorage.getItem('va-theme') || 'dark';
-        document.documentElement.dataset.theme = saved;
-      } catch(e){
-        document.documentElement.dataset.theme = 'dark';
-      }
-    })();
-  </script>
 </head>
 <body>
-<div class="shell">
-  <div class="header">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı" style="width:28px;height:28px;object-fit:contain;">
-    <div>
-      <div class="title">Veri Ajansı – Yükleme Kayıtları</div>
-      <div class="subtitle">Formu doldurup veri yükleyen tüm firmalar burada listelenir.</div>
+  <header class="header">
+    <div class="brand">
+      <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+      <div>
+        <div class="title">Veri Ajansı – Yükleme Kayıtları</div>
+        <div class="subtitle">Formu doldurup veri yükleyen tüm firmalar burada listelenir.</div>
+      </div>
     </div>
-  </div>
     <div class="links">
-      <a href="/upload">Veri Yükle</a>
-      <a href="/dashboard">Son Dashboard</a>
-      <a href="/admin/uploads.csv?key={{ filters.key }}">CSV indir</a>
-      <a href="#" onclick="toggleTheme();return false;">Tema</a>
+      <a href="/upload">Veri yükle</a>
+      <a href="/dashboard">Son dashboard</a>
+      <a href="/logout">Çıkış yap</a>
     </div>
-  </div>
+  </header>
 
-  <section class="card">
-    <form class="filters" method="get" action="/admin/uploads">
-      <input type="hidden" name="key" value="{{ filters.key }}">
-      <span>İsim:</span><input type="text" name="name" value="{{ filters.name }}">
-      <span>E-posta:</span><input type="text" name="email" value="{{ filters.email }}">
-      <span>Şirket:</span><input type="text" name="company" value="{{ filters.company }}">
-      <span>Tür:</span>
-      <select name="data_type">
-        <option value="">Hepsi</option>
-        <option value="enerji" {% if filters.data_type=='enerji' %}selected{% endif %}>Enerji</option>
-        <option value="uretim" {% if filters.data_type=='uretim' %}selected{% endif %}>Üretim</option>
-        <option value="satis" {% if filters.data_type=='satis' %}selected{% endif %}>Satış</option>
-        <option value="depo" {% if filters.data_type=='depo' %}selected{% endif %}>Depo</option>
-        <option value="kalite" {% if filters.data_type=='kalite' %}selected{% endif %}>Kalite</option>
-        <option value="genel" {% if filters.data_type=='genel' %}selected{% endif %}>Genel</option>
-      </select>
-      <span>Tarih &ge;</span><input type="text" name="date_from" placeholder="2025-01-01" value="{{ filters.date_from }}">
-      <span>Tarih &le;</span><input type="text" name="date_to" placeholder="2025-12-31" value="{{ filters.date_to }}">
-      <button type="submit">Filtrele</button>
-      <a href="/admin/uploads?key={{ filters.key }}">Temizle</a>
+  <section class="filters">
+    <form method="get" action="/admin/uploads">
+      <div class="filter-row">
+        <input type="text" name="name" placeholder="İsim" value="{{ filters.name }}">
+        <input type="text" name="company" placeholder="Firma" value="{{ filters.company }}">
+        <input type="text" name="email" placeholder="E-posta" value="{{ filters.email }}">
+        <input type="text" name="data_type" placeholder="Veri tipi" value="{{ filters.data_type }}">
+      </div>
+      <div class="filter-row">
+        <input type="date" name="date_from" value="{{ filters.date_from }}">
+        <input type="date" name="date_to" value="{{ filters.date_to }}">
+        <button type="submit">Filtrele</button>
+      </div>
     </form>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>Tarih</th><th>İsim</th><th>Şirket</th><th>Email</th><th>Telefon</th><th>Tür</th><th>Dosya</th><th>Satır</th><th>Sütun</th><th>Aksiyon</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for log in logs %}
-          <tr>
-            <td>{{ log.id }}</td>
-            <td>{{ log.upload_time }}</td>
-            <td>{{ log.name }}</td>
-            <td>{{ log.company }}</td>
-            <td>{{ log.email }}</td>
-            <td>{{ log.phone }}</td>
-            <td>{{ log.data_type }}</td>
-            <td>{{ log.file_name }}</td>
-            <td>{{ log.row_count }}</td>
-            <td>{{ log.col_count }}</td>
-            <td>
-              <button type="button" class="small-btn"
-                onclick="generateMail('{{ log.name }}','{{ log.email }}','{{ log.data_type }}','{{ log.row_count }}','{{ log.col_count }}')">
-                Mail Taslağı
-              </button>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <h3 style="font-size:13px;margin-top:8px;">Oluşturulan Mail Taslağı</h3>
-    <textarea id="mailTemplate" placeholder="Bir kaydın 'Mail Taslağı' butonuna tıkladığınızda buraya otomatik metin düşer."></textarea>
-    <div class="hint">
-      Metni kopyalayıp kendi e-posta istemcinizde (Outlook, Gmail vb.) kullanabilirsiniz.
-    </div>
   </section>
-</div>
+
+  <section class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tarih</th>
+          <th>İsim</th>
+          <th>Firma</th>
+          <th>E-posta</th>
+          <th>Telefon</th>
+          <th>Veri tipi</th>
+          <th>Dosya</th>
+          <th>Satır</th>
+          <th>Sütun</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in logs %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.upload_time }}</td>
+          <td>{{ row.name }}</td>
+          <td>{{ row.company }}</td>
+          <td>{{ row.email }}</td>
+          <td>{{ row.phone }}</td>
+          <td>{{ row.data_type }}</td>
+          <td>{{ row.file_name }}</td>
+          <td>{{ row.row_count }}</td>
+          <td>{{ row.col_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
 </body>
 </html>

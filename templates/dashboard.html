@@ -2,252 +2,298 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <title>Veri Ajansı – Son Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Veri Ajansı – Dashboard</title>
   <style>
     * { box-sizing:border-box; }
     body {
       margin:0;
       font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#1d283a,#020617 60%);
-      color:#e5e7eb;
+      background:#f3f4f6;           /* AÇIK ARKA PLAN */
+      color:#0f172a;
+      padding:16px;
     }
-    .shell {
-      min-height:100vh;
-      padding:18px 26px 26px;
+    .page {
+      max-width:1120px;
+      margin:0 auto;
     }
     .header {
       display:flex;
       justify-content:space-between;
-      align-items:center;
+      align-items:flex-start;
       margin-bottom:18px;
+      gap:12px;
     }
-    .title {
-      font-size:18px;
-      font-weight:600;
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
-    .subtitle {
-      font-size:12px;
-      color:#9ca3af;
+    .brand img {
+      width:36px;
+      height:36px;
+      object-fit:contain;
     }
+    .title { font-size:20px;font-weight:650; }
+    .subtitle { font-size:12px;color:#6b7280; }
     .links a {
       font-size:12px;
-      color:#cbd5f5;
-      margin-left:10px;
+      color:#0f766e;
       text-decoration:none;
+      margin-left:10px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#e0f2f1;
+      border:1px solid #99f6e4;
+      display:inline-block;
     }
-    .links a:hover { color:white; }
+    .links a:hover {
+      background:#ccfbf1;
+    }
 
     .grid {
       display:grid;
-      grid-template-columns:2.1fr 1.3fr;
+      grid-template-columns:1.4fr 1fr;
       gap:16px;
     }
+
     .card {
-      background:rgba(15,23,42,0.96);
+      background:white;
       border-radius:18px;
+      border:1px solid rgba(148,163,184,0.6);
       padding:14px 14px 12px;
-      border:1px solid rgba(148,163,184,0.45);
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      box-shadow:0 14px 35px rgba(15,23,42,0.09);
     }
-    .card h3 {
+    h2 {
       margin:0 0 8px;
-      font-size:14px;
-    }
-    .kpi-row {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:8px;
-    }
-    .kpi {
-      flex:1 1 120px;
-      padding:8px 9px;
-      border-radius:12px;
-      background:linear-gradient(135deg,#0f172a,#1e293b);
-      border:1px solid rgba(148,163,184,0.5);
-      font-size:12px;
-    }
-    .kpi span {
-      display:block;
-    }
-    .kpi-label {
-      color:#9ca3af;
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-    }
-    .kpi-value {
       font-size:16px;
-      font-weight:600;
-      color:#e5e7eb;
-      margin-top:2px;
     }
-    .charts {
+    h3 {
+      margin:8px 0 6px;
+      font-size:13px;
+      color:#111827;
+    }
+
+    .stats-row {
       display:flex;
       flex-wrap:wrap;
       gap:10px;
+      margin-bottom:10px;
+    }
+    .stat-card {
+      flex:1 1 130px;
+      min-width:130px;
+      background:#ecfeff;
+      border-radius:14px;
+      padding:8px 10px;
+      border:1px solid #99f6e4;
+    }
+    .stat-label {
+      font-size:11px;
+      color:#0f766e;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:2px;
+    }
+    .stat-value {
+      font-size:18px;
+      font-weight:650;
+      color:#083344;
+    }
+    .stat-sub {
+      font-size:11px;
+      color:#64748b;
+    }
+
+    .table-wrapper {
+      font-size:11px;
+      max-height:260px;
+      overflow:auto;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+    }
+    table {
+      border-collapse:collapse;
+      width:100%;
+    }
+    th, td {
+      padding:4px 6px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      white-space:nowrap;
+    }
+    th {
+      position:sticky;
+      top:0;
+      background:#f1f5f9;
+      font-size:11px;
+      color:#4b5563;
+      z-index:1;
+    }
+    tr:nth-child(even) td {
+      background:#f9fafb;
+    }
+
+    .badge-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:8px;
+      margin-top:4px;
+    }
+    .badge {
+      border-radius:999px;
+      padding:3px 8px;
+      background:#eef2ff;
+      border:1px solid #c7d2fe;
+      font-size:11px;
+      color:#3730a3;
+    }
+
+    .chart-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
       margin-top:6px;
     }
-    .chart-card {
-      flex:1 1 210px;
-      max-width:240px;
+    .chart-row img {
+      max-width:160px;
       border-radius:12px;
-      background:#020617;
-      border:1px solid rgba(148,163,184,0.5);
-      padding:6px;
+      border:1px solid #e5e7eb;
+      background:white;
     }
-    .chart-card img {
-      width:100%;
-      border-radius:8px;
+
+    .insights {
+      font-size:12px;
+      color:#374151;
+      list-style:disc;
+      padding-left:18px;
+      margin:4px 0 0;
     }
-    .chart-title {
-      font-size:11px;
-      color:#9ca3af;
-      margin-bottom:3px;
-    }
-    .info {
+    .empty {
       font-size:12px;
       color:#9ca3af;
     }
-    @media (max-width:900px) {
-      .shell { padding:14px; }
+
+    @media(max-width:900px){
       .grid { grid-template-columns:1fr; }
-    }
-      html[data-theme="light"] body {
-      background:#f3f4f6;
-      color:#0f172a;
-    }
-    html[data-theme="light"] .card {
-      background:#ffffff;
-      border-color:#e5e7eb;
     }
   </style>
 </head>
 <body>
-<div class="shell">
-  <div class="header">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı" style="width:32px;height:32px;object-fit:contain;">
-    <div>
-      <div class="title">Veri Ajansı – Son Veri Dashboard</div>
-      <div class="subtitle">Dosya: {{ file_name }} ({{ data_type }}) – Satır: {{ row_count }}, Sütun: {{ col_count }}</div>
-    </div>
-  </div>
-    <div class="links">
-      <a href="/upload">Yeni Veri Yükle</a>
-      <a href="/admin/uploads?key=veriadmin">Yükleme Kayıtları</a>
-      <a href="#" onclick="toggleTheme();return false;">Tema</a>
-    </div>
-  </div>
-
-  <div class="grid">
-    <section class="card">
-      <h3>Genel Durum</h3>
-      <div class="kpi-row">
-        <div class="kpi">
-          <span class="kpi-label">Toplam Satır</span>
-          <span class="kpi-value">{{ row_count }}</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Toplam Sütun</span>
-          <span class="kpi-value">{{ col_count }}</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Veri Kalite Puanı</span>
-          <span class="kpi-value">{{ "%.1f"|format(quality_score) }}%</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi-label">Sayısal Kolon</span>
-          <span class="kpi-value">{{ numeric_cols|length }}</span>
+  <div class="page">
+    <header class="header">
+      <div class="brand">
+        <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+        <div>
+          <div class="title">Son Veri Dashboard’u</div>
+          <div class="subtitle">
+            Dosya: <strong>{{ file_name }}</strong> · Tür: {{ data_type }} ·
+            Satır: {{ row_count }}, Sütun: {{ col_count }}
+          </div>
         </div>
       </div>
-      <p class="info">
-        Veri kalite puanı; eksik hücre oranına göre yaklaşık bir kalite metriğidir. Detaylı temizlik ve modelleme için ek çalışma önerilir.
-      </p>
-    </section>
-
-    <section class="card">
-      <h3>Kısa Notlar</h3>
-      <ul class="info">
-        <li>Örnek kayıt sayısı: ilk 20 satır raporda gösterilir.</li>
-        <li>Grafikler, ilk sayısal kolon ve varsa zaman serisi kolonlarına göre otomatik üretilir.</li>
-        <li>Admin ekranından geçmiş yüklemelere ve müşteri iletişim bilgilerine erişebilirsiniz.</li>
-      </ul>
-    </section>
-  </div>
-
-  <section class="card" style="margin-top:14px;">
-    <h3>Grafikler</h3>
-    {% if chart_data %}
-    <div style="margin-bottom:14px;display:flex;justify-content:flex-start;">
-      <div style="max-width:520px;width:100%;">
-        <canvas id="interactiveChartDash" style="width:100%;height:220px;max-height:260px;background:#020617;border-radius:12px;border:1px solid #4b5563;"></canvas>
-        <script type="application/json" id="chartDataJsonDash">{{ chart_data | tojson }}</script>
+      <div class="links">
+        <a href="/upload">Yeni veri yükle</a>
+        <a href="/">Ana sayfa</a>
+        <a href="/admin/uploads">Yükleme kayıtları</a>
       </div>
-    </div>
-    {% endif %}
-    <div class="charts">
-      {% if chart_paths %}
-        {% for path in chart_paths %}
-        <div class="chart-card">
-          <div class="chart-title">Grafik {{ loop.index }}</div>
+    </header>
+
+    <main class="grid">
+      <!-- SOL: Genel istatistik + tablo -->
+      <section class="card">
+        <h2>Genel Görünüm</h2>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Veri boyutu</div>
+            <div class="stat-value">{{ row_count }}</div>
+            <div class="stat-sub">toplam satır · {{ col_count }} kolon</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Sayısal kolonlar</div>
+            <div class="stat-value">{{ numeric_cols|length }}</div>
+            <div class="stat-sub">istatistik üretilen alan sayısı</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Veri kalitesi</div>
+            <div class="stat-value">{{ '%.1f'|format(quality_score) }}%</div>
+            <div class="stat-sub">eksik veri oranı düşerse skor yükselir</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Eksik hücre</div>
+            <div class="stat-value">{{ total_missing }}</div>
+            <div class="stat-sub">toplam eksik hücre adedi</div>
+          </div>
+        </div>
+
+        <h3>Sayısal Alan Özetleri</h3>
+        {% if summary_stats %}
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Alan</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Ortalama</th>
+                <th>Toplam</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for col, stats in summary_stats.items() %}
+              <tr>
+                <td>{{ col }}</td>
+                <td>{{ '%.2f'|format(stats.min) }}</td>
+                <td>{{ '%.2f'|format(stats.max) }}</td>
+                <td>{{ '%.2f'|format(stats.mean) }}</td>
+                <td>{{ '%.2f'|format(stats.sum) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty">Sayısal kolon bulunamadı; istatistik üretilemedi.</p>
+        {% endif %}
+      </section>
+
+      <!-- SAĞ: Grafikler + içgörüler -->
+      <aside class="card">
+        <h2>Görseller ve İçgörüler</h2>
+
+        <h3>Grafikler</h3>
+        {% if chart_paths %}
+        <div class="chart-row">
+          {% for path in chart_paths %}
           <img src="{{ path }}" alt="Grafik">
+          {% endfor %}
         </div>
-        {% endfor %}
-      {% else %}
-        <p class="info">Henüz gösterilecek grafik bulunamadı.</p>
-      {% endif %}
-    </div>
-  </section>
-</div>
+        {% else %}
+        <p class="empty">Bu veri seti için henüz grafik üretilmedi.</p>
+        {% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  function toggleTheme() {
-    const html = document.documentElement;
-    const current = html.dataset.theme || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.dataset.theme = next;
-    try { localStorage.setItem('va-theme', next); } catch(e){}
-  }
-  (function initTheme(){
-    try {
-      const saved = localStorage.getItem('va-theme') || 'dark';
-      document.documentElement.dataset.theme = saved;
-    } catch(e){
-      document.documentElement.dataset.theme = 'dark';
-    }
-  })();
+        <h3>Alan Bazlı İçgörüler</h3>
+        {% if domain_insights %}
+        <ul class="insights">
+          {% for msg in domain_insights %}
+          <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Otomatik içgörü bulunamadı.</p>
+        {% endif %}
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const el = document.getElementById('interactiveChartDash');
-    if (!el) return;
-    const dataEl = document.getElementById('chartDataJsonDash');
-    if (!dataEl) return;
-    const payload = JSON.parse(dataEl.textContent || '{}');
-    if (!payload || !payload.values || payload.values.length === 0) return;
-
-    const ctx = el.getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: payload.labels,
-        datasets: [{
-          label: payload.label,
-          data: payload.values,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: true } },
-        scales: { x: { ticks: { display: false } } }
-      }
-    });
-  });
-</script>
+        <h3>Hızlı Özet</h3>
+        <div class="badge-row">
+          <span class="badge">Dosya: {{ file_name }}</span>
+          <span class="badge">Veri tipi: {{ data_type }}</span>
+          <span class="badge">Sayısal kolon: {{ numeric_cols|length }}</span>
+          <span class="badge">Toplam hücre: {{ total_cells }}</span>
+        </div>
+      </aside>
+    </main>
+  </div>
 </body>
-</html>
 </html>

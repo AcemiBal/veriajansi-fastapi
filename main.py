@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -7,19 +7,35 @@ import pandas as pd
 import numpy as np
 import io
 import os
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "veriadmin")  # Railway'de override edeceğiz
+SESSION_COOKIE_NAME = "va_logged"
+
+
+def is_logged_in(request: Request) -> bool:
+    return request.cookies.get(SESSION_COOKIE_NAME) == "1"
+
 import uuid
 import sqlite3
 from datetime import datetime
 import matplotlib.pyplot as plt
 
+# -------------------------------------------------
+# FastAPI uygulaması
+# -------------------------------------------------
 app = FastAPI()
 
+# Statik dosyalar ve Jinja2 şablonları
 os.makedirs("static/charts", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+# Son analiz context'i (dashboard için)
 last_analysis_context = None
 
+# -------------------------------------------------
+# Veritabanı (upload logları)
+# -------------------------------------------------
 def init_db():
     conn = sqlite3.connect("data.db")
     c = conn.cursor()
@@ -37,7 +53,7 @@ def init_db():
             upload_time TEXT
         )"""
     )
-    # eski tabloda phone kolonu yoksa eklemeye çalış
+    # Eski tabloda phone kolonu yoksa eklemeye çalış
     try:
         c.execute("ALTER TABLE upload_logs ADD COLUMN phone TEXT")
     except Exception:
@@ -45,17 +61,32 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 def log_upload(name, company, email, phone, data_type, file_name, row_count, col_count):
     init_db()
     conn = sqlite3.connect("data.db")
     c = conn.cursor()
     c.execute(
         "INSERT INTO upload_logs (name, company, email, phone, data_type, file_name, row_count, col_count, upload_time) VALUES (?,?,?,?,?,?,?,?,?)",
-        (name, company, email, phone, data_type, file_name, row_count, col_count, datetime.now().isoformat()),
+        (
+            name,
+            company,
+            email,
+            phone,
+            data_type,
+            file_name,
+            row_count,
+            col_count,
+            datetime.now().isoformat(),
+        ),
     )
     conn.commit()
     conn.close()
 
+
+# -------------------------------------------------
+# Yardımcı fonksiyonlar
+# -------------------------------------------------
 def resolve_theme_class(data_type: str) -> str:
     dt = (data_type or "").lower()
     if "enerji" in dt:
@@ -70,6 +101,7 @@ def resolve_theme_class(data_type: str) -> str:
         return "theme-kalite"
     return "theme-default"
 
+
 def detect_column(df: pd.DataFrame, keywords):
     lowered = {col: col.lower() for col in df.columns}
     for col, low in lowered.items():
@@ -77,6 +109,7 @@ def detect_column(df: pd.DataFrame, keywords):
             if kw in low:
                 return col
     return None
+
 
 def create_charts(df: pd.DataFrame, numeric_cols, datetime_cols):
     chart_paths = []
@@ -115,7 +148,10 @@ def create_charts(df: pd.DataFrame, numeric_cols, datetime_cols):
 
     # 3) İlk 5 sayısal kolon ortalamaları
     if len(numeric_cols) >= 2:
-        means = df[numeric_cols].mean(numeric_only=True).sort_values(ascending=False)[:5]
+        means = (
+            df[numeric_cols].mean(numeric_only=True)
+            .sort_values(ascending=False)[:5]
+        )
         chart_id3 = str(uuid.uuid4())
         path3 = f"static/charts/{chart_id3}.png"
         plt.figure(figsize=(6, 3))
@@ -164,7 +200,13 @@ def create_charts(df: pd.DataFrame, numeric_cols, datetime_cols):
             path5 = f"static/charts/{chart_id5}.png"
             plt.figure(figsize=(4, 3))
             plt.imshow(corr, aspect="auto")
-            plt.xticks(range(len(corr.columns)), corr.columns, rotation=45, ha="right", fontsize=6)
+            plt.xticks(
+                range(len(corr.columns)),
+                corr.columns,
+                rotation=45,
+                ha="right",
+                fontsize=6,
+            )
             plt.yticks(range(len(corr.index)), corr.index, fontsize=6)
             plt.title("Korelasyon Isı Haritası", fontsize=8)
             plt.colorbar()
@@ -200,6 +242,7 @@ def create_charts(df: pd.DataFrame, numeric_cols, datetime_cols):
 
     return chart_paths
 
+
 def analyze_dataframe(df: pd.DataFrame, data_type: str):
     row_count = len(df)
     col_count = len(df.columns)
@@ -218,7 +261,9 @@ def analyze_dataframe(df: pd.DataFrame, data_type: str):
         }
 
     na_counts = df.isna().sum().to_dict()
-    datetime_cols = df.select_dtypes(include=["datetime64[ns]"]).columns.tolist()
+    datetime_cols = df.select_dtypes(
+        include=["datetime64[ns]"]
+    ).columns.tolist()
     has_time_series = len(datetime_cols) > 0
 
     total_missing = int(df.isna().sum().sum())
@@ -243,7 +288,9 @@ def analyze_dataframe(df: pd.DataFrame, data_type: str):
         top_categories[col] = {str(idx): int(val) for idx, val in vc.items()}
 
     chart_paths = create_charts(df, numeric_cols, datetime_cols)
-    sample_html = df.head(20).to_html(classes="table table-striped", border=0)
+    sample_html = df.head(20).to_html(
+        classes="table table-striped", border=0
+    )
 
     # İnteraktif grafik için ilk sayısal kolondan örnek seri hazırla
     chart_data = None
@@ -264,21 +311,35 @@ def analyze_dataframe(df: pd.DataFrame, data_type: str):
         if col_kwh and col_kwh in numeric_cols:
             total_kwh = float(df[col_kwh].sum())
             avg_kwh = float(df[col_kwh].mean())
-            domain_insights.append(f"Toplam enerji tüketimi (yaklaşık): {total_kwh:,.2f} birim.")
-            domain_insights.append(f"Ortalama tüketim: {avg_kwh:,.2f} birim.")
+            domain_insights.append(
+                f"Toplam enerji tüketimi (yaklaşık): {total_kwh:,.2f} birim."
+            )
+            domain_insights.append(
+                f"Ortalama tüketim: {avg_kwh:,.2f} birim."
+            )
     elif "uretim" in data_type_lower or "üretim" in data_type_lower:
-        col_qty = detect_column(df, ["adet", "miktar", "qty", "quantity", "output"])
+        col_qty = detect_column(
+            df, ["adet", "miktar", "qty", "quantity", "output"]
+        )
         if col_qty and col_qty in numeric_cols:
             total_qty = float(df[col_qty].sum())
-            domain_insights.append(f"Toplam üretim miktarı (yaklaşık): {total_qty:,.0f} birim.")
+            domain_insights.append(
+                f"Toplam üretim miktarı (yaklaşık): {total_qty:,.0f} birim."
+            )
     elif "satis" in data_type_lower or "satış" in data_type_lower:
-        col_amount = detect_column(df, ["tutar", "amount", "sale", "ciro", "revenue", "price"])
+        col_amount = detect_column(
+            df, ["tutar", "amount", "sale", "ciro", "revenue", "price"]
+        )
         if col_amount and col_amount in numeric_cols:
             total_sales = float(df[col_amount].sum())
-            domain_insights.append(f"Toplam satış cirosu (yaklaşık): {total_sales:,.2f} birim.")
+            domain_insights.append(
+                f"Toplam satış cirosu (yaklaşık): {total_sales:,.2f} birim."
+            )
 
     if not domain_insights:
-        domain_insights.append("Veriniz üzerinde genel istatistikler çıkarıldı. Detaylı analiz için özel modeller eklenebilir.")
+        domain_insights.append(
+            "Veriniz üzerinde genel istatistikler çıkarıldı. Detaylı analiz için özel modeller eklenebilir."
+        )
 
     return {
         "row_count": row_count,
@@ -300,15 +361,29 @@ def analyze_dataframe(df: pd.DataFrame, data_type: str):
         "top_var_col": top_var_col,
         "top_categories": top_categories,
     }
+
+
+# -------------------------------------------------
+# Routes
+# -------------------------------------------------
+
+# Ana ekran: basit HTML, upload ve admin linkleri
 @app.get("/", response_class=HTMLResponse)
-async def home():
-    return """<h3>Veri Analiz Asistanı v10 (FastAPI)</h3>
-    <p><a href='/upload'>Veri yükleme formu</a></p>
-    <p><a href='/admin/uploads?key=veriadmin'>Admin log ekranı</a></p>"""
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+
+
+# Health-check endpoint (Railway, monitoring vb. için)
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "veri_ajansi"}
+
 
 @app.get("/upload", response_class=HTMLResponse)
 async def upload_page(request: Request):
     return templates.TemplateResponse("form.html", {"request": request})
+
 
 @app.post("/api/upload", response_class=HTMLResponse)
 async def upload_file(
@@ -329,10 +404,21 @@ async def upload_file(
         else:
             df = pd.read_excel(io.BytesIO(contents))
     except Exception as e:
-        return HTMLResponse(f"<h3>Dosya okunamadı:</h3><pre>{e}</pre>", status_code=400)
+        return HTMLResponse(
+            f"<h3>Dosya okunamadı:</h3><pre>{e}</pre>", status_code=400
+        )
 
     analysis = analyze_dataframe(df, data_type)
-    log_upload(name, company, email, phone, data_type, file.filename, analysis["row_count"], analysis["col_count"])
+    log_upload(
+        name,
+        company,
+        email,
+        phone,
+        data_type,
+        file.filename,
+        analysis["row_count"],
+        analysis["col_count"],
+    )
 
     theme = resolve_theme_class(data_type)
     context = {
@@ -346,21 +432,29 @@ async def upload_file(
         "theme": theme,
         **analysis,
     }
-    last_analysis_context = {k: v for k, v in context.items() if k != "request"}
+    last_analysis_context = {
+        k: v for k, v in context.items() if k != "request"
+    }
 
     return templates.TemplateResponse("report.html", context)
+
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     global last_analysis_context
     if not last_analysis_context:
         return HTMLResponse(
-            "<h3>Henüz dashboard için bir veri yüklenmedi.</h3><p>Önce /upload üzerinden bir dosya gönderin.</p>",
+            "<h3>Henüz dashboard için bir veri yüklenmedi.</h3>"
+            "<p>Önce /upload üzerinden bir dosya gönderin.</p>",
             status_code=200,
         )
-    theme = last_analysis_context.get("theme", resolve_theme_class(last_analysis_context.get("data_type", "")))
+    theme = last_analysis_context.get(
+        "theme",
+        resolve_theme_class(last_analysis_context.get("data_type", "")),
+    )
     context = {"request": request, "theme": theme, **last_analysis_context}
     return templates.TemplateResponse("dashboard.html", context)
+
 
 @app.get("/admin/uploads", response_class=HTMLResponse)
 async def admin_uploads(request: Request):
@@ -413,7 +507,11 @@ async def admin_uploads(request: Request):
         "date_to": date_to,
         "key": key,
     }
-    return templates.TemplateResponse("admin_uploads.html", {"request": request, "logs": logs, "filters": filters})
+    return templates.TemplateResponse(
+        "admin_uploads.html",
+        {"request": request, "logs": logs, "filters": filters},
+    )
+
 
 @app.get("/admin/uploads.csv", response_class=PlainTextResponse)
 async def admin_uploads_csv(request: Request):
@@ -423,9 +521,15 @@ async def admin_uploads_csv(request: Request):
 
     init_db()
     conn = sqlite3.connect("data.db")
-    df_logs = pd.read_sql_query("SELECT * FROM upload_logs ORDER BY id DESC", conn)
+    df_logs = pd.read_sql_query(
+        "SELECT * FROM upload_logs ORDER BY id DESC", conn
+    )
     conn.close()
     csv_data = df_logs.to_csv(index=False)
-    return PlainTextResponse(csv_data, media_type="text/csv", headers={
-        "Content-Disposition": "attachment; filename=upload_logs.csv"
-    })
+    return PlainTextResponse(
+        csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=upload_logs.csv"
+        },
+    )

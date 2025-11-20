@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Veri Ajansı – Admin Girişi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617 55%);
+      color:#e5e7eb;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .card {
+      background:rgba(15,23,42,0.96);
+      border-radius:18px;
+      padding:24px 22px 22px;
+      width:100%;
+      max-width:380px;
+      border:1px solid rgba(45,212,191,0.4);
+      box-shadow:0 22px 70px rgba(0,0,0,0.75);
+    }
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:18px;
+    }
+    .brand img {
+      width:32px;
+      height:32px;
+      object-fit:contain;
+    }
+    .brand-title {
+      font-size:16px;
+      font-weight:600;
+    }
+    .brand-sub {
+      font-size:12px;
+      color:#9ca3af;
+    }
+    label {
+      display:block;
+      font-size:12px;
+      margin-bottom:4px;
+      color:#cbd5f5;
+    }
+    input {
+      width:100%;
+      padding:7px 9px;
+      border-radius:10px;
+      border:1px solid #4b5563;
+      background:#020617;
+      color:#e5e7eb;
+      font-size:13px;
+      margin-bottom:10px;
+    }
+    input:focus {
+      outline:none;
+      border-color:#14b8a6;
+      box-shadow:0 0 0 1px rgba(45,212,191,0.35);
+    }
+    button {
+      width:100%;
+      padding:9px 0;
+      border-radius:999px;
+      border:none;
+      background:linear-gradient(135deg,#0f766e,#14b8a6);
+      color:#ecfeff;
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+      margin-top:4px;
+    }
+    button:hover { opacity:0.96; }
+    .error {
+      background:rgba(127,29,29,0.9);
+      border-radius:10px;
+      padding:6px 8px;
+      font-size:11px;
+      margin-bottom:10px;
+      border:1px solid rgba(248,113,113,0.6);
+      color:#fee2e2;
+    }
+    .hint {
+      margin-top:10px;
+      font-size:11px;
+      color:#9ca3af;
+      text-align:center;
+    }
+    .hint a { color:#67e8f9; text-decoration:none; }
+    .hint a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">
+      <img src="/static/logo_veri_ajansi.png" alt="Veri Ajansı">
+      <div>
+        <div class="brand-title">Veri Ajansı – Admin Girişi</div>
+        <div class="brand-sub">Yükleme kayıtları ve loglara erişim için oturum açın.</div>
+      </div>
+    </div>
+
+    {% if error %}
+    <div class="error">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/login">
+      <label for="username">Kullanıcı Adı</label>
+      <input id="username" name="username" autocomplete="username" required>
+
+      <label for="password">Şifre</label>
+      <input id="password" type="password" name="password" autocomplete="current-password" required>
+
+      <button type="submit">Giriş Yap</button>
+    </form>
+
+    <div class="hint">
+      Veri Ajansı demo paneli.<br>
+      Oturum açtıktan sonra <a href="/admin/uploads">yükleme kayıtları</a> sayfasına yönlendirileceksiniz.
+    </div>
+  </div>
+</body>
+</html>
