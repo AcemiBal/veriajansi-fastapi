@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -10,21 +9,42 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: #f8f9fa;
+            font-size: 14px;
+            background-color: #f9fafb;
+            color: #333;
         }
-        .table-responsive {
-            margin-top: 1rem;
+        h1, h3, h4, h5 {
+            font-weight: 600;
         }
-        .insights-list li {
-            margin-bottom: 0.5rem;
+        h1 { font-size: 1.5rem; }
+        h3 { font-size: 1.25rem; }
+        h4, h5 { font-size: 1rem; }
+        .navbar {
+            font-size: 14px;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .table {
+            font-size: 13px;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 12px;
+            color: #777;
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Veri Ajansı</a>
+            <a class="navbar-brand fw-bold" href="#">Veri Ajansı</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -32,110 +52,128 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/upload">Yeni veri yükle</a></li>
                     <li class="nav-item"><a class="nav-link" href="/dashboard">Son dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">PDF / Yazdır</a></li>
+                    <li class="nav-item"><a class="btn btn-outline-secondary btn-sm" href="#">PDF / Yazdır</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Hero -->
     <div class="container my-4">
-        <h1 class="mb-3">Otomatik Analiz Raporu</h1>
-        <p class="text-muted">{{ company }} · {{ data_type }} · Dosya: {{ file_name }}</p>
+        <div class="text-center mb-4">
+            <h1 class="mb-2">Otomatik Analiz Raporu</h1>
+            <p class="text-muted small">{{ company }} · {{ data_type }} · Dosya: {{ file_name }}</p>
+        </div>
 
         <!-- Genel Özet -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h3 class="card-title">Genel Özet</h3>
-                <p>Toplam satır: {{ row_count }}, sütun: {{ col_count }}</p>
-                <p>Veri sahibi: {{ name }} ({{ email }})</p>
-                <p>Veri kalite skoru: {{ '%.1f'|format(quality_score) }}%</p>
-                <p>Toplam hücre: {{ total_cells }}, eksik hücre: {{ total_missing }}</p>
+        <div class="card mb-3">
+            <h3 class="mb-3">Genel Özet</h3>
+            <ul class="small">
+                <li>Toplam satır: {{ row_count }}, sütun: {{ col_count }}</li>
+                <li>Veri sahibi: {{ name }} ({{ email }})</li>
+                <li>Veri kalite skoru: {{ '%.1f'|format(quality_score) }}%</li>
+                <li>Toplam hücre: {{ total_cells }}, eksik hücre: {{ total_missing }}</li>
                 {% if top_missing_col %}
-                <p>En çok eksik değer içeren kolon: <strong>{{ top_missing_col }}</strong></p>
+                <li>En çok eksik değer içeren kolon: <strong>{{ top_missing_col }}</strong></li>
                 {% endif %}
                 {% if top_var_col %}
-                <p>Değişkenliği en yüksek sayısal kolon: <strong>{{ top_var_col }}</strong></p>
+                <li>Değişkenliği en yüksek sayısal kolon: <strong>{{ top_var_col }}</strong></li>
                 {% endif %}
-            </div>
+            </ul>
         </div>
 
         <!-- Alan Listesi -->
-        <h4>Alan Listesi</h4>
-        <ul class="list-group mb-4">
-            {% for col in columns %}
-            <li class="list-group-item">{{ col }}</li>
-            {% endfor %}
-        </ul>
+        <div class="card mb-3">
+            <h4>Alan Listesi</h4>
+            <ul class="list-group list-group-flush small">
+                {% for col in columns %}
+                <li class="list-group-item">{{ col }}</li>
+                {% endfor %}
+            </ul>
+        </div>
 
         <!-- Sayısal Alan İstatistikleri -->
-        <h4>Sayısal Alan İstatistikleri</h4>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Alan</th>
-                        <th>Min</th>
-                        <th>Maks</th>
-                        <th>Ortalama</th>
-                        <th>Toplam</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for col, stats in summary_stats.items() %}
-                    <tr>
-                        <td>{{ col }}</td>
-                        <td>{{ '%.2f'|format(stats.min) }}</td>
-                        <td>{{ '%.2f'|format(stats.max) }}</td>
-                        <td>{{ '%.2f'|format(stats.mean) }}</td>
-                        <td>{{ '%.2f'|format(stats.sum) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card mb-3">
+            <h4>Sayısal Alan İstatistikleri</h4>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Alan</th>
+                            <th>Min</th>
+                            <th>Maks</th>
+                            <th>Ortalama</th>
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for col, stats in summary_stats.items() %}
+                        <tr>
+                            <td>{{ col }}</td>
+                            <td>{{ '%.2f'|format(stats.min) }}</td>
+                            <td>{{ '%.2f'|format(stats.max) }}</td>
+                            <td>{{ '%.2f'|format(stats.mean) }}</td>
+                            <td>{{ '%.2f'|format(stats.sum) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Örnek İlk 20 Satır -->
-        <h4 class="mt-4">Örnek İlk 20 Satır</h4>
-        <div class="table-responsive">
-            {{ sample_html|safe }}
+        <div class="card mb-3">
+            <h4>Örnek İlk 20 Satır</h4>
+            <div class="table-responsive">
+                {{ sample_html|safe }}
+            </div>
         </div>
 
         <!-- Görseller ve İçgörüler -->
-        <h4 class="mt-4">Görseller ve İçgörüler</h4>
         <div class="row">
-            <div class="col-md-6">
-                <h5>Grafikler</h5>
-                {% for path in chart_paths %}
-                <img src="{{ path }}" class="img-fluid mb-3" alt="Grafik">
-                {% endfor %}
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <h5>Grafikler</h5>
+                    {% for path in chart_paths %}
+                    <div class="mb-2">{{ path }}</div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="col-md-6">
-                <h5>Alan Bazlı İçgörüler</h5>
-                <ul class="insights-list">
-                    {% if domain_insights %}
-                        {% for msg in domain_insights %}
-                        <li>{{ msg }}</li>
-                        {% endfor %}
-                    {% else %}
-                        <li>Bu veri seti için genel istatistikler hesaplandı. İleri seviye içgörüler için özel modeller eklenebilir.</li>
-                    {% endif %}
-                </ul>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <h5>Alan Bazlı İçgörüler</h5>
+                    <ul class="small">
+                        {% if domain_insights %}
+                            {% for msg in domain_insights %}
+                            <li>{{ msg }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>Bu veri seti için genel istatistikler hesaplandı. İleri seviye içgörüler için özel modeller eklenebilir.</li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
 
         {% if top_categories %}
-        <h4 class="mt-4">Kategorik Alan Özetleri</h4>
-        {% for col, cats in top_categories.items() %}
-        <h5>{{ col }}</h5>
-        <ul>
-            {% for k, v in cats.items() %}
-            <li>{{ k }} → {{ v }}</li>
+        <div class="card mb-3">
+            <h4>Kategorik Alan Özetleri</h4>
+            {% for col, cats in top_categories.items() %}
+            <h5 class="mt-2">{{ col }}</h5>
+            <ul class="small">
+                {% for k, v in cats.items() %}
+                <li>{{ k }} → {{ v }}</li>
+                {% endfor %}
+            </ul>
             {% endfor %}
-        </ul>
-        {% endfor %}
+        </div>
         {% endif %}
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2025 Veri Ajansı. Tüm hakları saklıdır.
+    </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
