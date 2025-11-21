@@ -1,7 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
+jinja2
+python-multipart
 pandas
 numpy
 matplotlib
-jinja2
-python-multipart
